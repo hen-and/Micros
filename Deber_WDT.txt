@@ -1,0 +1,42 @@
+// wdt_enable(tiempo)->   tiempo   15MS =8S -> habilitar wdt
+// milisegundos: 15,30,60,120,250,500
+// segundos : 1,2,4,8
+// tiempo  -> WDTo_15MS
+//wdt_disable(); =desactivar el perro guardian
+//wdt_reset(); = borrar registros del wdt
+#include <avr/wdt.h>
+#include <EEPROM.h>
+#include <TimerOne.h>
+int i = EEPROM.read(0);
+int on = 0;
+void setup() {
+  Serial.begin(9600);
+  Serial.println("SETUP");
+  Timer1.initialize(1000000);
+  Timer1.attachInterrupt(timer);
+  attachInterrupt(0, activar, LOW);
+  wdt_enable(WDTO_2S);
+}
+
+void loop() {
+  i++;
+
+  Serial.println(i);
+  delay(200);
+}
+
+void activar() {
+  on = 1 - on;
+  if (on == 1)
+    wdt_disable();
+  else {
+    wdt_reset();
+    wdt_enable(WDTO_4S);
+
+  }
+}
+void timer () {
+  Serial.println("lectirao actualizacion");
+  EEPROM.write(0, i);
+  
+}
