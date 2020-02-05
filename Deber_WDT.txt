@@ -1,42 +1,48 @@
-// wdt_enable(tiempo)->   tiempo   15MS =8S -> habilitar wdt
-// milisegundos: 15,30,60,120,250,500
-// segundos : 1,2,4,8
-// tiempo  -> WDTo_15MS
-//wdt_disable(); =desactivar el perro guardian
-//wdt_reset(); = borrar registros del wdt
-#include <avr/wdt.h>
-#include <EEPROM.h>
-#include <TimerOne.h>
-int i = EEPROM.read(0);
-int on = 0;
+int segundos=0;
+String datos="";
+
 void setup() {
+  wdt_disable();
+  MsTimer2::set(1000,reloj);
+  MsTimer2::stop();
   Serial.begin(9600);
-  Serial.println("SETUP");
-  Timer1.initialize(1000000);
-  Timer1.attachInterrupt(timer);
-  attachInterrupt(0, activar, LOW);
-  wdt_enable(WDTO_2S);
+  Serial.println("INGRESE LA LETRA ");  
 }
 
 void loop() {
-  i++;
-
-  Serial.println(i);
-  delay(200);
-}
-
-void activar() {
-  on = 1 - on;
-  if (on == 1)
-    wdt_disable();
-  else {
-    wdt_reset();
-    wdt_enable(WDTO_4S);
-
-  }
-}
-void timer () {
-  Serial.println("lectirao actualizacion");
-  EEPROM.write(0, i);
   
+  if(Serial.available()>0){
+  datos=Serial.readString();
+  Serial.println(" ");
+  }
+  
+   if (datos=="A"){
+      Serial.println("WDTO_1S");
+      MsTimer2::start();
+      wdt_enable(WDTO_1S);
+      datos="";
+   }
+   if (datos=="B"){
+      Serial.println("WDTO_2S");
+      MsTimer2::start();
+      wdt_enable(WDTO_2S);
+      datos="";
+   }
+   if (datos=="C"){
+      Serial.println("WDTO_4S");
+      MsTimer2::start();
+      wdt_enable(WDTO_4S);
+      datos="";
+   }
+      if (datos=="D"){
+      Serial.println("WDTO_8S");
+      MsTimer2::start();
+      wdt_enable(WDTO_8S);
+      datos="";
+    }
 }
+
+void reloj(){
+  segundos++;
+    Serial.println(segundos);
+  }
